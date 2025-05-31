@@ -1,4 +1,4 @@
-require('dotenv').config(); // Load environment variables from .env file
+require('dotenv').config();
 
 const express = require('express');
 const axios = require('axios');
@@ -15,7 +15,6 @@ const LOGS_DIR = './logs';
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 if (!fs.existsSync(LOGS_DIR)) fs.mkdirSync(LOGS_DIR);
 
-// Set port from .env, default to 3000
 const APP_PORT = process.env.APP_PORT || 3000;
 
 function log(message, level = 'info') {
