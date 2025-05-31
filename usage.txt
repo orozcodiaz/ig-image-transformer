@@ -1,0 +1,1 @@
+curl --location 'http://localhost:3000/process-image?imageUrl=https%3A%2F%2Fstatic.wixstatic.com%2Fmedia%2F7757c2_068974977835454dadbfd74e15e7aa1d~mv2.jpeg%2Fv1%2Ffill%2Fw_1600%2Ch_711%2Cal_c%2Cq_85%2Cenc_auto%2F7757c2_068974977835454dadbfd74e15e7aa1d~mv2.jpeg'
