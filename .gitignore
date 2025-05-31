@@ -5,3 +5,4 @@ logs/*
 !logs/.gitkeep
 .idea/
 .env
+.crs-deployer.yml
