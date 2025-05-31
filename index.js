@@ -59,14 +59,18 @@ app.get('/process-image', async (req, res) => {
             processedBuffer = originalBuffer;
         }
 
-        // Generate random MD5 hash as filename
-        const randomString = crypto.randomBytes(16).toString('hex'); // 32 chars long
+        // Generate random filename
+        const randomString = crypto.randomBytes(16).toString('hex');
         const extension = path.extname(new URL(imageUrl).pathname) || '.jpg';
         const processedFilename = `${randomString}${extension}`;
         const processedPath = path.join(UPLOAD_DIR, processedFilename);
 
         // Save processed image
-        await fs.promises.writeFile(processedPath, processedBuffer);
+        await fs.writeFile(processedPath, processedBuffer);
+
+        // Output detailed log
+        const now = new Date();
+        console.log(`[${now.toISOString()}] Processed image: ${processedFilename}, from URL: ${imageUrl}`);
 
         // Return direct download link
         const downloadLink = `${req.protocol}://${req.get('host')}/download/${processedFilename}`;
@@ -80,10 +84,9 @@ app.get('/process-image', async (req, res) => {
 
 // Serve processed images for download
 app.get('/download/:filename', (req, res) => {
-    const filename = req.params.filename;
-    const filePath = path.join(UPLOAD_DIR, filename);
-    if (fs.existsSync(path.join(__dirname, UPLOAD_DIR, filename))) {
-        res.sendFile(filePath, { root: __dirname });
+    const filePath = path.join(__dirname, UPLOAD_DIR, req.params.filename);
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
     } else {
         res.status(404).send('File not found.');
     }
