@@ -9,10 +9,34 @@ const crypto = require('crypto');
 
 const app = express();
 const UPLOAD_DIR = './uploads';
+const LOGS_DIR = './logs';
+
+// Create directories if they don't exist
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
+if (!fs.existsSync(LOGS_DIR)) fs.mkdirSync(LOGS_DIR);
 
 // Set port from .env, default to 3000
 const APP_PORT = process.env.APP_PORT || 3000;
+
+function log(message, level = 'info') {
+    const now = new Date();
+    const prefix = level === 'error' ? 'ERROR: ' : '';
+    const logMessage = `[${now.toISOString()}] ${prefix}${message}`;
+
+    // Log to console
+    switch(level) {
+        case 'error':
+            console.error(logMessage);
+            break;
+        default:
+            console.log(logMessage);
+    }
+
+    // Log to file
+    const currentDate = now.toISOString().split('T')[0];
+    const logFile = path.join(LOGS_DIR, `${currentDate}.log`);
+    fs.appendFileSync(logFile, logMessage + '\n');
+}
 
 app.get('/process-image', async (req, res) => {
     const { imageUrl } = req.query;
@@ -68,16 +92,14 @@ app.get('/process-image', async (req, res) => {
         // Save processed image
         await fs.promises.writeFile(processedPath, processedBuffer);
 
-        // Output detailed log
-        const now = new Date();
-        console.log(`[${now.toISOString()}] Processed image: ${processedFilename}, from URL: ${imageUrl}`);
+        log(`Processed image: ${processedFilename}, from URL: ${imageUrl}`);
 
         // Return direct download link
         const downloadLink = `${req.protocol}://${req.get('host')}/download/${processedFilename}`;
         res.json({ downloadLink });
 
     } catch (error) {
-        console.error(error);
+        log(error.message || error, 'error');
         res.status(500).send('Error processing image.');
     }
 });
@@ -94,5 +116,5 @@ app.get('/download/:filename', (req, res) => {
 });
 
 app.listen(APP_PORT, () => {
-    console.log(`Server running on port ${APP_PORT}`);
+    log(`Server running on port ${APP_PORT}`);
 });
