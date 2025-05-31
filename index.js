@@ -1,13 +1,18 @@
+require('dotenv').config(); // Load environment variables from .env file
+
 const express = require('express');
 const axios = require('axios');
 const sharp = require('sharp');
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 const crypto = require('crypto');
 
 const app = express();
 const UPLOAD_DIR = './uploads';
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
+
+// Set port from .env, default to 3000
+const PORT = process.env.PORT || 3000;
 
 app.get('/process-image', async (req, res) => {
     const { imageUrl } = req.query;
@@ -84,5 +89,6 @@ app.get('/download/:filename', (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
