@@ -3,7 +3,7 @@ require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const axios = require('axios');
 const sharp = require('sharp');
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
@@ -59,14 +59,14 @@ app.get('/process-image', async (req, res) => {
             processedBuffer = originalBuffer;
         }
 
-        // Generate random filename
-        const randomString = crypto.randomBytes(16).toString('hex');
+        // Generate random MD5 hash as filename
+        const randomString = crypto.randomBytes(16).toString('hex'); // 32 chars long
         const extension = path.extname(new URL(imageUrl).pathname) || '.jpg';
         const processedFilename = `${randomString}${extension}`;
         const processedPath = path.join(UPLOAD_DIR, processedFilename);
 
         // Save processed image
-        await fs.writeFile(processedPath, processedBuffer);
+        await fs.promises.writeFile(processedPath, processedBuffer);
 
         // Output detailed log
         const now = new Date();
@@ -84,9 +84,10 @@ app.get('/process-image', async (req, res) => {
 
 // Serve processed images for download
 app.get('/download/:filename', (req, res) => {
-    const filePath = path.join(__dirname, UPLOAD_DIR, req.params.filename);
-    if (fs.existsSync(filePath)) {
-        res.sendFile(filePath);
+    const filename = req.params.filename;
+    const filePath = path.join(UPLOAD_DIR, filename);
+    if (fs.existsSync(path.join(__dirname, UPLOAD_DIR, filename))) {
+        res.sendFile(filePath, { root: __dirname });
     } else {
         res.status(404).send('File not found.');
     }
