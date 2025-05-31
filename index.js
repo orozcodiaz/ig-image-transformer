@@ -12,7 +12,7 @@ const UPLOAD_DIR = './uploads';
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 
 // Set port from .env, default to 3000
-const PORT = process.env.PORT || 3000;
+const APP_PORT = process.env.APP_PORT || 3000;
 
 app.get('/process-image', async (req, res) => {
     const { imageUrl } = req.query;
@@ -93,6 +93,6 @@ app.get('/download/:filename', (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+app.listen(APP_PORT, () => {
+    console.log(`Server running on port ${APP_PORT}`);
 });
